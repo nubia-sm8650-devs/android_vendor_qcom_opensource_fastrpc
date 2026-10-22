@@ -1,0 +1,97 @@
+soong_namespace {
+}
+
+genrule {
+    name: "libdsprpc_version_script",
+    srcs: ["src/symbols.lst"],
+    out: ["libdsprpc.map"],
+    cmd: "sed '/^\\/\\//d' $(in) > $(out)",
+}
+
+cc_defaults {
+    name: "libdsprpc_defaults",
+    device_specific: true,
+    srcs: [
+        "src/BufBound.c",
+        "src/adsp_current_process1_stub.c",
+        "src/adsp_current_process_stub.c",
+        "src/adsp_listener1_stub.c",
+        "src/adsp_listener_stub.c",
+        "src/adsp_perf1_stub.c",
+        "src/adsp_perf_stub.c",
+        "src/adspmsgd.c",
+        "src/adspmsgd_adsp1_stub.c",
+        "src/adspmsgd_adsp_stub.c",
+        "src/adspmsgd_apps_skel.c",
+        "src/adspmsgd_printf.c",
+        "src/apps_mem_imp.c",
+        "src/apps_mem_skel.c",
+        "src/apps_remotectl_skel.c",
+        "src/apps_std_imp.c",
+        "src/apps_std_skel.c",
+        "src/dspqueue/dspqueue_cpu.c",
+        "src/dspqueue/dspqueue_rpc_stub.c",
+        "src/dspsignal.c",
+        "src/fastrpc_apps_user.c",
+        "src/fastrpc_cap.c",
+        "src/fastrpc_config.c",
+        "src/fastrpc_context.c",
+        "src/fastrpc_ioctl.c",
+        "src/fastrpc_log.c",
+        "src/fastrpc_mem.c",
+        "src/fastrpc_notif.c",
+        "src/fastrpc_perf.c",
+        "src/fastrpc_pm.c",
+        "src/fastrpc_procbuf.c",
+        "src/gpls.c",
+        "src/listener_android.c",
+        "src/log_config.c",
+        "src/mod_table.c",
+        "src/pl_list.c",
+        "src/platform_libs.c",
+        "src/remotectl1_stub.c",
+        "src/remotectl_stub.c",
+        "src/rpcmem_linux.c",
+        "src/std_dtoa.c",
+        "src/std_path.c",
+    ],
+    local_include_dirs: ["inc"],
+    cflags: [
+        "-fno-short-enums",
+        "-U_DEBUG",
+        "-DARM_ARCH_7A",
+        "-DLE_ENABLE",
+        "-DENABLE_UPSTREAM_DRIVER_INTERFACE",
+        "-DUSE_SYSLOG",
+        "-DCONFIG_BASE_DIR=\"/vendor/dsp\"",
+        "-DMACHINE_NAME_PATH=\"/sys/firmware/devicetree/base/model\"",
+        "-DDEFAULT_DSP_SEARCH_PATHS=\";/vendor/lib64/rfs/dsp;/vendor/lib/rfsa/adsp;/vendor/lib/rfsa/dsp;/vendor/dsp;\"",
+        "-Wno-strlcpy-strlcat-size",
+    ],
+    shared_libs: [
+        "libdl",
+        "liblog",
+    ],
+    version_script: ":libdsprpc_version_script",
+}
+
+cc_library_shared {
+    name: "libadsprpc.upstream",
+    stem: "libadsprpc",
+    defaults: ["libdsprpc_defaults"],
+    cflags: ["-DDEFAULT_DOMAIN_ID=0"],
+}
+
+cc_library_shared {
+    name: "libsdsprpc.upstream",
+    stem: "libsdsprpc",
+    defaults: ["libdsprpc_defaults"],
+    cflags: ["-DDEFAULT_DOMAIN_ID=2"],
+}
+
+cc_library_shared {
+    name: "libcdsprpc.upstream",
+    stem: "libcdsprpc",
+    defaults: ["libdsprpc_defaults"],
+    cflags: ["-DDEFAULT_DOMAIN_ID=3"],
+}
