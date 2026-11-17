@@ -31,6 +31,7 @@ cc_defaults {
         "src/apps_std_skel.c",
         "src/dspqueue/dspqueue_cpu.c",
         "src/dspqueue/dspqueue_rpc_stub.c",
+        "src/dsp_service_client.cpp",
         "src/dspsignal.c",
         "src/fastrpc_apps_user.c",
         "src/fastrpc_cap.c",
@@ -62,6 +63,7 @@ cc_defaults {
         "-DARM_ARCH_7A",
         "-DLE_ENABLE",
         "-DENABLE_UPSTREAM_DRIVER_INTERFACE",
+        "-DFASTRPC_DSP_SERVICE",
         "-DUSE_SYSLOG",
         "-DCONFIG_BASE_DIR=\"/vendor/dsp\"",
         "-DMACHINE_NAME_PATH=\"/sys/firmware/devicetree/base/model\"",
@@ -69,8 +71,10 @@ cc_defaults {
         "-Wno-strlcpy-strlcat-size",
     ],
     shared_libs: [
+        "libbinder_ndk",
         "libdl",
         "liblog",
+        "vendor.qti.hardware.dsp-V1-ndk",
     ],
     version_script: ":libdsprpc_version_script",
 }

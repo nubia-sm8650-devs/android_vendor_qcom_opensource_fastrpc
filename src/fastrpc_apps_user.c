@@ -99,6 +99,9 @@ static char DSP_SEARCH_PATHS_CACHE[NUM_DOMAINS][PATH_MAX] = {{0}};
 #include <sys/inotify.h>
 #include <sys/mman.h>
 #endif // __WIN32
+#ifdef FASTRPC_DSP_SERVICE
+#include "dsp_service_client.h"
+#endif
 
 #ifndef INT_MAX
 #define INT_MAX (int)(-1)
@@ -3215,6 +3218,15 @@ int open_device_node(int domain_id) {
            secure_dev, domain, strerror(errno), non_secure_dev);
       dev = open(non_secure_dev, O_NONBLOCK);
     }
+#ifdef FASTRPC_DSP_SERVICE
+    if ((dev < 0) && (errno == EACCES) && (domain == CDSP_DOMAIN_ID)) {
+      FARF(RUNTIME_RPC_HIGH,
+           "Device node %s open failed for domain %d (errno %s), "
+           "asking the DSP service\n",
+           non_secure_dev, domain, strerror(errno));
+      dev = open_device_node_from_service(domain);
+    }
+#endif
   }
   if (dev < 0)
     FARF(ERROR,
